@@ -3,129 +3,110 @@ title: "README"
 format: gfm
 ---
 
+---
+title: "README"
+format: gfm
+---
+
 ## Lyrical Topic Modeling (Taylor’s Version)
 
-
 # Project Overview
-This project analyzes Taylor Swift's song lyrics, identifies themes and emotional vibes of her entire discography, and segregate into groups that give the same vibe. The entire process includes web scraping, data cleaning, topic modeling with LDA, sentiment analysis, and an interactive Streamlit dashboard for visualization.
-
+This project analyzes Taylor Swift's song lyrics, identifies recurring themes and emotional vibes across her discography, and groups songs based on these vibes. The workflow includes web scraping, data cleaning, topic modeling with LDA, sentiment analysis, and an interactive Streamlit dashboard for visualization.
 
 # Reference Links
-
-- Link to Taylor Swift's page on Genius: https://genius.com/artists/Taylor-swift/songs
-
-- Link to Taylor Swift's discography page on Discogs: https://www.discogs.com/artist/1124645-Taylor-Swift?srsltid=AfmBOopvo-xhBkd1-xg3RZqGElU9XPKbymXsIg4dAH7rqqrkA-y5m7W- 
-
-
+- [Taylor Swift on Genius](https://genius.com/artists/Taylor-swift/songs)  
+- [Taylor Swift Discography on Discogs](https://www.discogs.com/artist/1124645-Taylor-Swift?srsltid=AfmBOopvo-xhBkd1-xg3RZqGElU9XPKbymXsIg4dAH7rqqrkA-y5m7W-)  
 
 # Project Structure
 
-* pw_get_links.py - Scrapes song links from Genius
+**pw_get_links.py** - Scrapes song links from Genius  
+- Uses Playwright to navigate and scroll through Taylor Swift's song catalog.  
+- Extracts song titles and URLs.  
+- Saves data to CSV (`ts_songs_link1.csv`).  
 
-    - Uses Playwright to navigate and scroll through Taylor Swift's song catalog
- 
-    - Extracts song titles and URLs
-  
-    - Saves data to CSV format as ts_songs_link1.csv
+**pw_get_lyrics.py** - Scrapes lyrics from individual song pages  
+- Iterates through links in `ts_songs_link1.csv`.  
+- Fetches complete lyrics, song name, and page URL.  
+- Saves lyrics data to CSV (`ts_tw_lyrics1.csv`).  
 
+**scrape_album.py** - Scrapes album names and tracklists from Discogs  
+- Iterates through each album page.  
+- Collects album names, release dates, and track listings.  
+- Saves album metadata to CSV (`albums.csv`) for later merging.  
 
-* pw_get_lyrics.py - Scrapes lyrics from individual song pages
+**data_cleaning.qmd** - Data wrangling, cleaning, and merging  
+- Cleans and preprocesses scraped lyrics.  
+- Merges lyrics with album data using fuzzy matching.  
+- Saves the final dataset to CSV (`final_dataset.csv`).  
 
-    - Uses Playwright to iterate through collected links in ts_songs_link1.csv 
-    
-    - Fetches complete lyrics, song name, and link to the page.
+**topic_modeling.qmd** - Topic analysis and sentiment scoring  
+- Preprocesses and cleans lyrics for modeling.  
+- Performs topic modeling using LDA (11 topics).  
+- Conducts sentiment analysis using Hugging Face transformers.  
+- Interprets and names topics.  
 
-    - Saves lyrics data to CSV as ts_tw_lyrics1.csv
-
-
-* scrape_album.py - Scrapes album name and tracklist from Discogs
-
-    - Uses Playwright to iterate throught the each album page 
-
-    - Collects album names, release dates, and track listings
-
-    - Saves album metadata to CSV for later merging with lyrics data as albums.csv
-
-
-* data_cleaning.qmd - Data wranging, cleaning, and merging
-
-    - Cleans and preprocessing scraped lyrics data from ts_tw_lyrics1.csv
-    
-    - Merges lyrics from ts_tw_lyrics1.csv with album data from using albums.csv using rapidfuzzy matching 
-    
-    - Final dataset saved to CSV as final_dataset.csv
+**streamlit_app.py** - Interactive dashboard  
+- Visualizes topic distributions.  
+- Explores songs by topic.  
+- Displays sentiment analysis results.  
+- Allows interactive filtering and exploration.  
 
 
-* topic_modeling.qmd - Data wrangin, cleaning, and merging
+# Running the Project
 
-    - Lyrics preprocessing and cleaning
+**Data Collection**  
 
-    - Topic modeling using LDA with 11 topics
-    
-    - Sentiment analysis using Hugging Face transformers
-    
-    - Topic interpretation and naming
+1. Get song links from Genius:  
+```{bash}
+python pw_get_links.py
+```
 
+2. Get lyrics for each song:
+```{bash}
+python pw_get_lyrics.py
+```
 
-* streamlit_app.py - Interactive dashboard
+3. Get album data from Discogs: 
+```{bash}
+python scrape_album.py
+```
 
-    - Visualizes topic distributions
-    
-    - Explores songs by topic
-    
-    - Displays sentiment analysis results
-    
-    - Interactive filtering and exploration
+**Data Analysis**
 
+4. Run data cleaning and merging:
+```{bash}
+quarto render data_cleaning.qmd
+```
 
+5. Perform topic modeling and sentiment analysis:
+```{bash}
+quarto render topic_modeling.qmd
+```
 
-# Running the Project:
+**Visualizing**
 
-* Data Collection:
+6. Run the Streamlit app:
+```{bash}
+python streamlit_app.py
+```
 
-    - Step 1: Get song links from Genius
-      Python run pw_get_links.py
-
-    - Step 2: Get album metadata from Discogs
-      Python run scrape_album.py
-
-    - Step 3: Get lyrics for each song
-      Python run pw_get_lyrics.py
-
-
-* Data Analysis:
-
-    - Step 4: Run data cleaning and merging from data_clenaing.qmd
-
-    - Step 5: Follow the steps in topic_modeling.qmd
-
-
-* Visualizing:
-
-    - Step 6: Get streamlit file running
-      Python run streamlit_app.py
-
-    - Step 7: Open the streamlit app with this commond in the terminal:
-      python3 -m streamlit run app.py
-      https://cherisa-bajracharya-taylor-swift-modeling-app-cjfhck.streamlit.app/
+    Or run via terminal:
+```{bash}
+python3 -m streamlit run app.py
+```
 
 
-# Outputs
+# Topics Overview
 
-    - Raw Data: CSV files with song links, lyrics, and metadata
-    
-    - Processed Dataset: Cleaned and merged dataset with topics and sentiment scores
-    
-    - Interactive Dashboard: Web-based visualization tool
-    
-    - Topic Models: Trained LDA model with topic-word distributions
+| Topic | Name                     | Example Keywords |
+|-------|--------------------------|-----------------|
+| 0     | Honey and Daylight       | york, hold, lights, feel, time, rains, floor, waitin, babe, called |
+| 1     | My Heart in Your Palms   | red, girl, wanna, gotta, lost, night, blue, lucky, walk, boy |
+| 2     | Ghosts of You            | baby, bad, blood, grow, feel, smile, time, fly, belong, wanna |
+| 3     | Rain or Shine            | live, time, wait, list, white, afraid, follow, god, wild, style |
+| 4     | Unapologetically ME!     | gonna, shake, hate, break, play, fake, baby, friends, mind, nice |
+| 5     | Beginning’s Butterflies  | stay, time, woods, trouble, mad, daylight, remember, finally, hard, wanna |
+| 6     | Hearts on the Edge       | love, beautiful, time, life, leave, loved, hands, bad, dancin, dark |
+| 7     | POV                      | remember, night, talk, starlight, forget, dreams, day, hair, lips, karma |
+| 8     | Echoes of Betrayal       | dress, car, story, dance, night, tonight, happy, summer, town, gonna |
 
-
-
-    
-    st.subheader("Why knowing each song's vibe matters?")
-    st.write("Taylor Swift's music has a wide range of emotions and themes. By categorizing her songs into topics, we can better understand the emotional landscape of her discography. As fans we know how much her songwriting means to us, but as marketers we also see how much she is benifitting out of the lores in her albums and how they are resonating with different audiences.")
-
-
-# License
-This project is for educational purposes. Please respect Genius's and Discogs's terms of service when scraping data.
