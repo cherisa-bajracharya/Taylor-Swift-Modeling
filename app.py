@@ -56,7 +56,6 @@ topic_words = [
     "dress, car, story, dance, night, tonight, happy, summer, town, gonna"
 ]
 
-# Add Main Page button at the top of sidebar
 if st.sidebar.button("Main Page", type="primary"):
     st.session_state.show_main_page = True
     st.rerun()
@@ -80,7 +79,6 @@ if selected_topic:
 
 submit_button = form.form_submit_button(label='Show Results')
 
-# Check if we should show main page or topic results
 if st.session_state.show_main_page and not submit_button:
     st.header("Lyrical Topic Modeling (Taylor's Version)")
     st.write("Experimenting how accurate topic modeling using LDA is at capturing the themes in Taylor Swift's music.")
@@ -130,8 +128,6 @@ if st.session_state.show_main_page and not submit_button:
 
     st.divider()
 
-
-     # Create bar chart for average sentiment with custom x-axis range
     st.subheader("How Positive are Taylor's Albums?")
     album_sentiment = df.groupby('album_name').agg({
         'sentiment_score': 'mean',
@@ -147,10 +143,10 @@ if st.session_state.show_main_page and not submit_button:
         y='Album',
         title='Average Sentiment Score by Album (Higher = More Positive)',
         color='Avg_Sentiment_Score',
-        color_continuous_scale='RdYlGn',  # Red-Yellow-Green scale
+        color_continuous_scale='RdYlGn',  
         orientation='h',
         hover_data=['Dominant_Sentiment', 'Song_Count'],
-        range_x=[0.7, album_sentiment['Avg_Sentiment_Score'].max() * 1.1]  # Start at 0.6
+        range_x=[0.7, album_sentiment['Avg_Sentiment_Score'].max() * 1.1] 
     )
 
     fig7.update_layout(
@@ -160,14 +156,13 @@ if st.session_state.show_main_page and not submit_button:
         coloraxis_colorbar=dict(title="Score"),
         yaxis={'categoryorder': 'total ascending'},
         xaxis=dict(
-            range=[0.7, album_sentiment['Avg_Sentiment_Score'].max() * 1.1]  # Also set in layout
+            range=[0.7, album_sentiment['Avg_Sentiment_Score'].max() * 1.1]  
         )
     )
 
     st.plotly_chart(fig7, use_container_width=True)
     
 elif submit_button:
-    # Update session state when showing topic results
     st.session_state.show_main_page = False
     
     st.header(f"Topic: {selected_topic}")
