@@ -1,0 +1,142 @@
+---
+title: "Lyrics Clean"
+format: html
+---
+
+```{python}
+import pandas as pd
+import re
+from rapidfuzz import process, fuzz
+```
+
+
+# Loading First Dataset with Links and Lyrics
+
+```{python}
+df = pd.read_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/ts_tw_lyrics1.csv')
+
+df
+```
+
+# Data cleaning
+
+* Removing the non-relevant lines
+
+```{python}
+df['lyrics'] = df['lyrics'].str.replace(r'.*(Read More|Contributors|Translations|Lyrics)', '', regex=True)
+df
+```
+
+
+* Removing the rows that are not lyrics
+
+```{python}
+df = df[df['lyrics'].str.contains(r'\[Chorus\]', regex=True, na=False)]
+df
+```
+
+
+* Removing the lyrics type ("Verse, Chorus")
+
+```{python}
+df['lyrics'] = df['lyrics'].str.replace(r'\[.*?\]', '', regex=True).str.strip()
+df
+```
+
+
+* Removing the songs that are not by Taylor Swift
+
+```{python}
+df = df[df['link'].str.contains(r'Taylor-swift', regex=True, na=False)]
+df
+```
+
+
+# Loading Second Dataset with Album Names
+
+```{python}
+df1 = pd.read_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/albums.csv')
+
+df1
+```
+
+
+# Data cleaning
+
+```{python}
+df1 = df1[~df1['album_name'].str.contains('Live From Paris|The Long Pond Studio Sessions', na=False)]
+df1
+```
+
+```{python}
+df1['album_name'] = df1['album_name'].str.replace(r'^Taylor Swift\s*[–]\s', '', regex=True).str.strip()
+df1
+```
+
+```{python}
+df1['song_name'] = df1['song']
+df1 = df1.drop(columns= ['song'])
+```
+
+```{python}
+df1["song_name"] = df1["song_name"].astype(str)
+```
+
+
+* Remove extra content from song_name
+
+```{python}
+pattern = r'\(.*?\)|\[.*?\]|[^\w\s]'
+
+df['song_clean'] = df['song_name'].str.replace(pattern, '', regex=True).str.strip()
+df1['song_clean'] = df1['song_name'].str.replace(pattern, '', regex=True).str.strip()
+```
+
+
+# Fuzzy match df and df1 on song_clean
+
+```{python}
+choices = df1['song_clean'].dropna().tolist()
+
+def rapidfuzz_match(song):
+    if pd.isna(song):
+        return None
+    result = process.extractOne(
+        str(song), 
+        choices, 
+        scorer=fuzz.WRatio,  
+        score_cutoff=10
+    )
+    return result[0] if result else None
+
+df1['matched_song_name'] = df1['song_clean'].apply(rapidfuzz_match)
+
+df_final = pd.merge(df1, df, left_on='matched_song_name', right_on='song_clean', how='left')
+
+df_final
+```
+
+
+* Drop rows with missing values and duplicates
+
+```{python}
+df_final = df_final[df_final['link'].notna()]
+
+
+df_final = df_final.drop_duplicates(subset=['song_name_x'])
+
+
+final_result = df_final[['album_name', 'track_number', 'song_name_x', 'link', 'lyrics']].copy()
+final_result.columns = ['album_name', 'track_no', 'song_name', 'link', 'lyrics']
+
+final_result = final_result.sort_values(['album_name', 'track_no'])
+
+final_result
+```
+
+
+# Extracting CSV
+
+```{python}
+final_result.to_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_dataset.csv', index=False)
+```
