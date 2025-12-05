@@ -1,0 +1,141 @@
+---
+title: "Modeling Lyrics"
+format: html
+---
+
+```{python}
+from sklearn.feature_extraction.text import CountVectorizer
+import lda
+import pandas as pd
+import numpy as np
+import requests
+from transformers import pipeline
+```
+
+
+# Loading the Dataset 
+
+```{python}
+cleaned_df = pd.read_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/final_dataset.csv')
+cleaned_df
+```
+
+
+# Dropping the Stopwords and cleaning the data
+
+```{python}
+cleaned_df['lyrics_cleaned'] = cleaned_df['lyrics'].str.lower()
+stopwords = requests.get('https://raw.githubusercontent.com/stopwords-iso/stopwords-en/refs/heads/master/stopwords-en.txt')
+
+stopwords = stopwords.text.split('\n')
+
+random_words = ['huh', 'em', 'di', 'da', 'somethin', 'ooh', 'uh', 'ha', 'hey', 'woah', 'yeah', '']
+
+[stopwords.append(x) for x in random_words]
+
+stopword_pattern = r'\b(?:{})\b'.format('|'.join(stopwords))
+
+cleaned_df['lyrics_cleaned'] = cleaned_df['lyrics_cleaned'].str.replace(stopword_pattern, '', regex=True)
+cleaned_df
+```
+
+
+# Fitting the data in a LDA Topic Model
+
+```{python}
+vectorizer = CountVectorizer()
+
+X = vectorizer.fit_transform(cleaned_df['lyrics_cleaned'])
+
+vocab = vectorizer.get_feature_names_out()
+
+model = lda.LDA(n_topics=11, n_iter=500, random_state=13)
+
+model.fit(X)
+```
+
+
+# Calculating the probability of each songs fit in each topic
+
+```{python}
+topic_word = model.topic_word_
+
+n_top_words = 50
+
+top_words = []
+
+for i, topic_dist in enumerate(topic_word):
+  topic_words = np.array(vocab)[np.argsort(topic_dist)][:-n_top_words:-1]
+  top_words.append(' '.join(topic_words))
+  print('Topic {}: {}'.format(i, ' '.join(topic_words)))
+
+model.doc_topic_
+```
+
+
+# Adding the modeling data to the dataframe and cleaning 
+
+```{python}
+cleaned_df['top_topic'] = np.argmax(model.doc_topic_, axis=1) #this
+
+cleaned_df['top_prob'] = [max(model.doc_topic_[x]) for x in range(len(model.doc_topic_))]
+
+cleaned_df['top_topic'].value_counts()
+
+for i in range(11):
+    cleaned_df[f'topic_{i}'] = model.doc_topic_[:, i]
+
+topic_rename_map = {
+    'topic_0': 'Teardrops on My Phone',
+    'topic_1': 'Sad Beautiful Tragic', 
+    'topic_2': 'Kissing in the Rain',
+    'topic_3': 'Fairytale Tragedy',
+    'topic_4': 'Young, Wild, and Unstoppable',
+    'topic_5': 'Shake It Off, Again',
+    'topic_6': "Honey, You're Daylight",
+    'topic_7': "Midas Touch Love",
+    'topic_8': 'You Are Always in Love',
+    'topic_9': 'Ruin the Reputation',
+    'topic_10': 'Still at the Table'
+}
+
+cleaned_df = cleaned_df.rename(columns=topic_rename_map)
+```
+
+
+# Checking the grouping of the model
+
+```{python}
+group = cleaned_df.groupby('top_topic')
+
+topic_counts = group['song_name'].count()
+print("Number of songs per topic:")
+print(topic_counts)
+print(cleaned_df.columns)
+```
+
+
+# Sentiment Analysis
+
+```{python}
+sentiment_analysis = pipeline("sentiment-analysis")
+
+def sentiment_results(text):
+    sent_result = sentiment_analysis(text)
+    label = sent_result[0]['label']
+    score = sent_result[0]['score']
+    return [label, score]
+
+cleaned_df['sent'] = cleaned_df['lyrics'].apply(lambda x: sentiment_results(str(x)[:511]))
+
+cleaned_df[['sentiment_label', 'sentiment_score']] = cleaned_df['sent'].apply(pd.Series)
+
+cleaned_df['sentiment_score'] = cleaned_df['sentiment_score'].round(4)
+```
+
+
+# Extracting CSV
+
+```{python}
+cleaned_df.to_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/modeled_dataset.csv', index=False)
+```
