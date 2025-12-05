@@ -127,6 +127,63 @@ if st.session_state.show_main_page and not submit_button:
     """)
 
     st.divider()
+    
+    st.subheader("Positivity of Each Topic")
+    
+    # Calculate positive song counts for each topic
+    topic_positive_counts = []
+    for i in range(9):
+        topic_df = df[df['top_topic'] == i]
+        positive_count = len(topic_df[topic_df['sentiment_label'] == 'POSITIVE'])
+        total_count = len(topic_df)
+        
+        topic_positive_counts.append({
+            'Topic': topic_names[i],
+            'Positive_Songs': positive_count,
+            'Total_Songs': total_count,
+            'Positive_Percentage': (positive_count / total_count * 100) if total_count > 0 else 0
+        })
+    
+    # Create DataFrame and sort by positive count
+    positive_df = pd.DataFrame(topic_positive_counts)
+    positive_df = positive_df.sort_values('Positive_Songs', ascending=True)
+    
+    # Create horizontal bar chart
+    fig_positive_counts = px.bar(
+        positive_df,
+        x='Positive_Songs',
+        y='Topic',
+        orientation='h',
+        color='Positive_Songs',
+        color_continuous_scale='RdYlGn',
+        title='Number of Positive Songs per Topic',
+        text='Positive_Songs',
+        hover_data=['Total_Songs', 'Positive_Percentage']
+    )
+    
+    # Update layout
+    fig_positive_counts.update_layout(
+        height=500,
+        yaxis_title="Topic",
+        xaxis_title="Number of Positive Songs",
+        yaxis={'categoryorder': 'total ascending'},
+        showlegend=False
+    )
+    
+    # Format hover data
+    fig_positive_counts.update_traces(
+        texttemplate='%{text}',
+        textposition='outside',
+        hovertemplate='<b>%{y}</b><br>' +
+                     'Positive Songs: %{x}<br>' +
+                     'Total Songs: %{customdata[0]}<br>' +
+                     'Percentage: %{customdata[1]:.1f}%<br>' +
+                     '<extra></extra>'
+    )
+    
+    st.plotly_chart(fig_positive_counts, use_container_width=True)
+    
+    st.divider()
 
     st.subheader("How Positive are Taylor's Albums?")
     album_sentiment = df.groupby('album_name').agg({
@@ -235,9 +292,8 @@ elif submit_button:
                          y='sentiment_score',
                          color='sentiment_label',  
                          color_discrete_map={
-                             'positive': 'blue',
-                             'neutral': 'gray',
-                             'negative': 'yellow'
+                             'POSITIVE': 'green',
+                             'NEGATIVE': 'red'
                          },
         hover_data=['album_name', 'song_name', 'top_prob', 'sentiment_score', 'sentiment_label'],
         labels={
@@ -248,10 +304,6 @@ elif submit_button:
 
         fig3.update_layout(
             height=500,
-            title_font_size=20,
-            title_x=0.5,
-            xaxis_title_font_size=14,
-            yaxis_title_font_size=14,
             legend_title_font_size=14,
             legend_font_size=11,
             hoverlabel=dict(
@@ -304,9 +356,8 @@ elif submit_button:
             names=sentiment_counts.index,
             color=sentiment_counts.index,
             color_discrete_map={
-                'positive': 'blue',
-                'neutral': 'gray',
-                'negative': 'yellow'
+                'POSITIVE': 'green',
+                'NEGATIVE': 'red'
             }
         )
         st.plotly_chart(fig4, use_container_width=True)
