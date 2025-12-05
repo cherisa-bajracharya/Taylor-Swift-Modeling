@@ -13,7 +13,7 @@ from rapidfuzz import process, fuzz
 # Loading First Dataset with Links and Lyrics
 
 ```{python}
-df = pd.read_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/ts_tw_lyrics1.csv')
+df = pd.read_csv('ts_tw_lyrics1.csv')
 
 df
 ```
@@ -55,7 +55,7 @@ df
 # Loading Second Dataset with Album Names
 
 ```{python}
-df1 = pd.read_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/albums.csv')
+df1 = pd.read_csv('albums.csv')
 
 df1
 ```
@@ -138,5 +138,5 @@ final_result
 # Extracting CSV
 
 ```{python}
-final_result.to_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_dataset.csv', index=False)
+final_result.to_csv('final_dataset.csv', index=False)
 ```
