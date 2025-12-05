@@ -1,0 +1,118 @@
+# README
+
+
+## Lyrical Topic Modeling (Taylor’s Version)
+
+# Project Overview
+
+This project analyzes Taylor Swift’s song lyrics, identifies recurring
+themes and emotional vibes across her discography, and groups songs
+based on these vibes. The workflow includes web scraping, data cleaning,
+topic modeling with LDA, sentiment analysis, and an interactive
+Streamlit dashboard for visualization.
+
+# Reference Links
+
+- [Taylor Swift on
+  Genius](https://genius.com/artists/Taylor-swift/songs)  
+- [Taylor Swift Discography on
+  Discogs](https://www.discogs.com/artist/1124645-Taylor-Swift?srsltid=AfmBOopvo-xhBkd1-xg3RZqGElU9XPKbymXsIg4dAH7rqqrkA-y5m7W-)
+
+# Project Structure
+
+**pw_get_links.py** - Scrapes song links from Genius  
+- Uses Playwright to navigate and scroll through Taylor Swift’s song
+catalog.  
+- Extracts song titles and URLs.  
+- Saves data to CSV (`ts_songs_link1.csv`).
+
+**pw_get_lyrics.py** - Scrapes lyrics from individual song pages  
+- Iterates through links in `ts_songs_link1.csv`.  
+- Fetches complete lyrics, song name, and page URL.  
+- Saves lyrics data to CSV (`ts_tw_lyrics1.csv`).
+
+**scrape_album.py** - Scrapes album names and tracklists from Discogs  
+- Iterates through each album page.  
+- Collects album names, release dates, and track listings.  
+- Saves album metadata to CSV (`albums.csv`) for later merging.
+
+**data_cleaning.qmd** - Data wrangling, cleaning, and merging  
+- Cleans and preprocesses scraped lyrics.  
+- Merges lyrics with album data using fuzzy matching.  
+- Saves the final dataset to CSV (`final_dataset.csv`).
+
+**topic_modeling.qmd** - Topic analysis and sentiment scoring  
+- Preprocesses and cleans lyrics for modeling.  
+- Performs topic modeling using LDA (11 topics).  
+- Conducts sentiment analysis using Hugging Face transformers.  
+- Interprets and names topics.
+
+**streamlit_app.py** - Interactive dashboard  
+- Visualizes topic distributions.  
+- Explores songs by topic.  
+- Displays sentiment analysis results.  
+- Allows interactive filtering and exploration.
+
+# Running the Project
+
+**Data Collection**
+
+1.  Get song links from Genius:  
+
+``` {bash}
+python pw_get_links.py
+```
+
+2.  Get lyrics for each song:
+
+``` {bash}
+python pw_get_lyrics.py
+```
+
+3.  Get album data from Discogs:
+
+``` {bash}
+python scrape_album.py
+```
+
+**Data Analysis**
+
+4.  Run data cleaning and merging:
+
+``` {bash}
+quarto render data_cleaning.qmd
+```
+
+5.  Perform topic modeling and sentiment analysis:
+
+``` {bash}
+quarto render topic_modeling.qmd
+```
+
+**Visualizing**
+
+6.  Run the Streamlit app:
+
+``` {bash}
+python streamlit_app.py
+```
+
+    Or run via terminal:
+
+``` {bash}
+python3 -m streamlit run app.py
+```
+
+# Topics Overview
+
+| Topic | Name | Example Keywords |
+|----|----|----|
+| 0 | Honey and Daylight | york, hold, lights, feel, time, rains, floor, waitin, babe, called |
+| 1 | My Heart in Your Palms | red, girl, wanna, gotta, lost, night, blue, lucky, walk, boy |
+| 2 | Ghosts of You | baby, bad, blood, grow, feel, smile, time, fly, belong, wanna |
+| 3 | Rain or Shine | live, time, wait, list, white, afraid, follow, god, wild, style |
+| 4 | Unapologetically ME! | gonna, shake, hate, break, play, fake, baby, friends, mind, nice |
+| 5 | Beginning’s Butterflies | stay, time, woods, trouble, mad, daylight, remember, finally, hard, wanna |
+| 6 | Hearts on the Edge | love, beautiful, time, life, leave, loved, hands, bad, dancin, dark |
+| 7 | POV | remember, night, talk, starlight, forget, dreams, day, hair, lips, karma |
+| 8 | Echoes of Betrayal | dress, car, story, dance, night, tonight, happy, summer, town, gonna |
