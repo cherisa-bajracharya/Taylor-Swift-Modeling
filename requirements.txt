@@ -1,0 +1,17 @@
+# Data Processing
+pandas
+numpy
+requests
+
+# Web Scraping
+playwright
+
+# Text Processing
+scikit-learn
+lda
+rapidfuzz
+transformers
+
+# Visualization & Dashboard
+streamlit
+plotly
