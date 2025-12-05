@@ -10,13 +10,14 @@ import pandas as pd
 import numpy as np
 import requests
 from transformers import pipeline
+from joblib import load, dump
 ```
 
 
 # Loading the Dataset 
 
 ```{python}
-cleaned_df = pd.read_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/final_dataset.csv')
+cleaned_df = pd.read_csv('final_dataset.csv')
 cleaned_df
 ```
 
@@ -40,24 +41,38 @@ cleaned_df
 ```
 
 
-# Fitting the data in a LDA Topic Model
+# Fitting the data in a LDA Topic Model and calculating the probability of each songs fit in each topic
 
-```{python}
+```
 vectorizer = CountVectorizer()
 
 X = vectorizer.fit_transform(cleaned_df['lyrics_cleaned'])
 
 vocab = vectorizer.get_feature_names_out()
 
-model = lda.LDA(n_topics=11, n_iter=500, random_state=13)
+model = lda.LDA(n_topics=9, n_iter=500, random_state=13)
 
 model.fit(X)
-```
 
+dump({
+        'vectorizer': vectorizer,
+        'X': X,
+        'vocab': vocab,
+        'model': model,
+        'cleaned_lyrics_column': cleaned_df['lyrics_cleaned']
+        }, 
+    'ly_dump_topic.joblib')
 
-# Calculating the probability of each songs fit in each topic
+vectorizer = CountVectorizer()
 
-```{python}
+X = vectorizer.fit_transform(cleaned_df['lyrics_cleaned'])
+
+vocab = vectorizer.get_feature_names_out()
+
+model = lda.LDA(n_topics=9, n_iter=500, random_state=13)
+
+model.fit(X)
+
 topic_word = model.topic_word_
 
 n_top_words = 50
@@ -69,37 +84,69 @@ for i, topic_dist in enumerate(topic_word):
   top_words.append(' '.join(topic_words))
   print('Topic {}: {}'.format(i, ' '.join(topic_words)))
 
-model.doc_topic_
+doc_topic = model.doc_topic_
+
+dump({
+        'vectorizer': vectorizer,
+        'X': X,
+        'vocab': vocab,
+        'model': model,
+        'cleaned_lyrics_column': cleaned_df['lyrics_cleaned'],
+        'topic_word': topic_word,
+        'top_words': top_words,
+        'doc_topic': doc_topic}, 
+    'ly_dump_topic.joblib')
 ```
 
+```
+Topic 0: york hold lights feel time rains floor waitin babe called wrong looked silence baby bright phone honey beat night blind told innocent middle promises friend crowd stars left sun stare bedroom girls flashback real dream coming caught head standing lord heart day boy lover town bed wearing eyes body
+
+Topic 1: red girl wanna gotta lost night blue lucky walk boy bye alright street met nights feels head lose time burning hit wonderland cool city heart game sky dancing delicate feeling taylor fun eyes worse guess song cornelia hope honestly reputation fall loving dark cried losing messed missing change favorite
+
+Topic 2: baby bad blood grow feel smile time fly belong wanna fuck fall kiss feeling fine cut eyes sparks darling light jump mmm simple pick lights shine hand stay deep moment rain bless mad phone drop hurt waiting whisper solve heart sign pieces thinking tired chasing hide heartbeat hallway track
+
+Topic 3: live time wait list white afraid follow god wild style leave lights girl vow meet lovers pain worth hear life insane fight game daydream single speak heard eyes screaming door drive eye bring treacherous hope kissed pretty mind reckless bout faith flames tight pretenders wrong straight learned stand shined
+
+Topic 4: gonna shake hate break play fake baby friends mind nice people comin honey fallin real revenge players life rings learn toys busy saint touch sayin sick actress hear heartbreak dancin romantic fast trust moves hot laughed foolish lie goin haters stealing grace god feet block dirty walkin polish hurts
+
+Topic 5: stay time woods trouble mad daylight remember finally hard wanna love clean december walked people hand goodbye talk night bet shame funny hold throw leave months lying water fall daughter late freedom flew grown start stand pouring change easy careless hope realized lock haze times breathe gonna rain careful
+
+Topic 6: love beautiful time life leave loved hands bad dancin dark mind save magic feel london baby smile walk kiss breath watch watched burn rain wrong tied coming left breathe figured deep break fly daddy wishing feelin fighting romeo laughin friends tragic usin crazy thinkin girls lord eyes screaming day
+
+Topic 7: remember night talk starlight forget dreams day hair lips karma bout dancing dream wind standin town stairs window time sweet friends lost rare die wildest door song days kitchen sacred street push prayer house change party red cheeks laugh cruel ground sky moved drive paper nice runnin car swear
+
+Topic 8: dress car story dance night tonight happy summer town gonna meet fight sad getaway love eyes fearless head waiting sing hand gorgeous met lot late wonderin crowded killin starts hallelujah hands win white nothin feel enchanted wide twist spend wanna fate day lead silence conversation horse lonely question screamin
+```
 
 # Adding the modeling data to the dataframe and cleaning 
 
 ```{python}
-cleaned_df['top_topic'] = np.argmax(model.doc_topic_, axis=1) #this
+loaded_data = load('ly_dump_topic.joblib')
+doc_topic = loaded_data['doc_topic']
 
-cleaned_df['top_prob'] = [max(model.doc_topic_[x]) for x in range(len(model.doc_topic_))]
+cleaned_df['top_topic'] = np.argmax(doc_topic, axis=1) 
+
+cleaned_df['top_prob'] = [max(doc_topic[x]) for x in range(len(doc_topic))]
 
 cleaned_df['top_topic'].value_counts()
 
-for i in range(11):
-    cleaned_df[f'topic_{i}'] = model.doc_topic_[:, i]
+for i in range(9):
+    cleaned_df[f'topic_{i}'] = doc_topic[:, i]
 
 topic_rename_map = {
-    'topic_0': 'Teardrops on My Phone',
-    'topic_1': 'Sad Beautiful Tragic', 
-    'topic_2': 'Kissing in the Rain',
-    'topic_3': 'Fairytale Tragedy',
-    'topic_4': 'Young, Wild, and Unstoppable',
-    'topic_5': 'Shake It Off, Again',
-    'topic_6': "Honey, You're Daylight",
-    'topic_7': "Midas Touch Love",
-    'topic_8': 'You Are Always in Love',
-    'topic_9': 'Ruin the Reputation',
-    'topic_10': 'Still at the Table'
+    'topic_0': 'Honey and Daylight',
+    'topic_1': 'My Heart in Your Palms', 
+    'topic_2': 'Ghosts of You',
+    'topic_3': 'Rain or Shine',
+    'topic_4': 'Unapologetically ME!',
+    'topic_5': 'Beginning’s Butterflies',
+    'topic_6': 'Hearts on the Edge',
+    'topic_7': 'POV',
+    'topic_8': 'Echoes of Betrayal'
 }
 
 cleaned_df = cleaned_df.rename(columns=topic_rename_map)
+cleaned_df
 ```
 
 
@@ -137,5 +184,5 @@ cleaned_df['sentiment_score'] = cleaned_df['sentiment_score'].round(4)
 # Extracting CSV
 
 ```{python}
-cleaned_df.to_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/modeled_dataset.csv', index=False)
+cleaned_df.to_csv('modeled_dataset.csv', index=False)
 ```
