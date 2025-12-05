@@ -36,7 +36,7 @@ for i in all_links[:20]:
         song_list.append({"album_name": album_name, "song": song_text, "track_number": s + 1})
     
 album_songs = pd.DataFrame(song_list)
-album_songs.to_csv('/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/albums.csv', index=False)
+album_songs.to_csv('albums.csv', index=False)
 
 page.close()
 chrome.close()

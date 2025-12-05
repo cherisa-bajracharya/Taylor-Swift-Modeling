@@ -35,7 +35,7 @@ for i in range(count):
 lyricsdf = pd.DataFrame(data)
 print(lyricsdf)
 
-lyricsdf.to_csv("/Users/cherisa/Documents/ND/Fall/Unstructured Data Analytics/final_project/final_files/ts_songs_link1.csv", index=False)
+lyricsdf.to_csv("ts_songs_link1.csv", index=False)
 
 page.close()
 chrome.close()
