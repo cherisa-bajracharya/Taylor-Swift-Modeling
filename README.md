@@ -11,6 +11,11 @@ based on these vibes. The workflow includes web scraping, data cleaning,
 topic modeling with LDA, sentiment analysis, and an interactive
 Streamlit dashboard for visualization.
 
+# Main App Link
+
+- [Lyrical Topic Modeling (Taylor’s
+  Version)](https://cherisa-bajracharya-taylor-swift-modeling-app-cjfhck.streamlit.app/)
+
 # Reference Links
 
 - [Taylor Swift on
@@ -116,3 +121,91 @@ python3 -m streamlit run app.py
 | 6 | Hearts on the Edge | love, beautiful, time, life, leave, loved, hands, bad, dancin, dark |
 | 7 | POV | remember, night, talk, starlight, forget, dreams, day, hair, lips, karma |
 | 8 | Echoes of Betrayal | dress, car, story, dance, night, tonight, happy, summer, town, gonna |
+
+# Analysis & Reflection
+
+## Pros
+
+- **High clustering accuracy:** Topic modeling successfully grouped over
+  70% of songs into meaningful themes, showing strong signal despite
+  messy, inconsistent lyric sources.  
+- **Efficient workflow for large text corpora:** The pipeline handled
+  hundreds of songs, scraping, cleaning, vectorizing, modeling, and
+  visualizing without major performance issues.  
+- **Clear insights into lyrical patterns:** The analysis highlighted
+  recurring emotional and thematic motifs across Taylor Swift’s
+  discography, useful for fan engagement, music marketing, or academic
+  analysis.  
+- **Strong foundation for future applications:** The project functions
+  as a prototype that could easily evolve into a public-facing lyric
+  explorer, a fan analytics tool, or a marketing insights dashboard.  
+- **Scalable structure:** The modular pipeline (scraping → cleaning →
+  NLP → Streamlit) can easily be adapted to analyze any artist,
+  soundtrack, or large lyric dataset.
+
+## Cons & Challenges
+
+- **Excessive and messy scraped data:** Genius.com listed over 1,700
+  Taylor Swift–related songs—including features, production credits, and
+  songs where she was mentioned—while she has only around 300 official
+  releases. Cleaning and filtering this down to her actual discography
+  was tedious and error-prone.
+- **Dataset Joining Issues:** Even after extensive cleaning, a low
+  similarity threshold (10%) had to be used when merging datasets by
+  `song_name`. Some duplicates may have been incorrectly included or
+  excluded.
+- **Sentiment Analysis Limitations:** The 511-character limit of the
+  transformer model fails to capture nuance, emotional shifts, sarcasm,
+  and poetic structure in Taylor Swift’s lyrics. Examples include
+  *Happiness* (a sad song) and *It’s Actually Romantic* (a diss track
+  written ironically).
+- **Topic Modeling Constraints:** LDA treats words independently, which
+  overlooks lyrical context and complexity. Some songs were misclustered
+  or oversimplified (e.g., *Is It Over Now?* and *Lover* in the same
+  “Honey and Daylight” cluster).
+
+## Streamlit App Reflection
+
+The Streamlit app acted as an effective analytics prototype, giving
+users an interactive way to explore lyrics, topics, and sentiment. While
+the current version is geared toward data interpretation rather than
+general user experience, it provides a strong foundation for future
+development.
+
+- The app could evolve into a mood- or theme-based music browsing tool
+  with album-inspired color palettes.  
+- Integrating music playback directly within the interface would greatly
+  enhance user engagement.  
+- Streamlit’s simplicity made development smooth and allowed fast
+  iteration—useful for prototyping real-world applications.  
+- Two versions could be created:
+  - **Fan-facing app:** focused on aesthetics, mood, color themes, and
+    song exploration  
+  - **Marketing/analytics app:** incorporating sales data, streaming
+    performance, and musical characteristics to identify patterns behind
+    successful tracks
+
+## Notes
+
+- **Web Scraping Ethics:** All scraping adhered to the terms of service
+  of Genius.com and Discogs.com, using only publicly accessible pages.
+- **Rate Limiting:** Random delays were added to prevent excessive
+  server requests.
+- **Data Accuracy:** Lyric variations across platforms may introduce
+  minor inconsistencies.
+- **Topic Interpretation:** LDA topics require human interpretation, as
+  the model clusters based on word patterns rather than meaning.
+
+## Suggestions & Next Steps
+
+- **Improve Sentiment Analysis:** Split lyrics into segments and
+  aggregate results to capture full emotional progression.
+- **Upgrade Topic Modeling:** Combine LDA with semantic embeddings
+  (e.g., Sentence-BERT) for context-aware clustering.
+- **Enhance the Streamlit App:**
+  - Add color themes or album-based visuals  
+  - Integrate music playback or playlist features  
+  - Develop separate versions for fan engagement vs. marketing
+    analytics  
+- **Add Storytelling Elements:** Highlight interesting patterns, lyrical
+  motifs, or surprises in the dashboard to engage users.
