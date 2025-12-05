@@ -301,6 +301,7 @@ elif submit_button:
                 'sentiment_score': 'Sentiment Score',
                 'sentiment_label': 'Sentiment'
                 })
+        
 
         fig3.update_layout(
             height=500,
