@@ -49,7 +49,7 @@ topic_words = [
     "red, girl, wanna, gotta, lost, night, blue, lucky, walk, boy",
     "baby, bad, blood, grow, feel, smile, time, fly, belong, wanna",
     "live, time, wait, list, white, afraid, follow, god, wild, style",
-    "live, time, wait, list, white, afraid, follow, god, wild, style",
+    "gonna, shake, hate, break, play, fake, baby, friends, mind, nice",
     "stay, time, woods, trouble, mad, daylight, remember, finally, hard, wanna",
     "love, beautiful, time, life, leave, loved, hands, bad, dancin, dark",
     "remember, night, talk, starlight, forget, dreams, day, hair, lips, karma",
