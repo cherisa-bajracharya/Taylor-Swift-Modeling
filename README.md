@@ -146,8 +146,8 @@ python3 -m streamlit run app.py
 ## Cons & Challenges
 
 - **Excessive and messy scraped data:** Genius.com listed over 1,700
-  Taylor Swift–related songs—including features, production credits, and
-  songs where she was mentioned—while she has only around 300 official
+  Taylor Swift–related songs including features, production credits, and
+  songs where she was mentioned even if she has only around 300 official
   releases. Cleaning and filtering this down to her actual discography
   was tedious and error-prone.
 - **Dataset Joining Issues:** Even after extensive cleaning, a low
@@ -177,7 +177,7 @@ development.
 - Integrating music playback directly within the interface would greatly
   enhance user engagement.  
 - Streamlit’s simplicity made development smooth and allowed fast
-  iteration—useful for prototyping real-world applications.  
+  iteration that was useful for prototyping real-world applications.  
 - Two versions could be created:
   - **Fan-facing app:** focused on aesthetics, mood, color themes, and
     song exploration  

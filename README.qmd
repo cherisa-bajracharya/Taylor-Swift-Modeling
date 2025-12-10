@@ -123,7 +123,7 @@ python3 -m streamlit run app.py
 - **Scalable structure:** The modular pipeline (scraping → cleaning → NLP → Streamlit) can easily be adapted to analyze any artist, soundtrack, or large lyric dataset.
 
 ## Cons & Challenges
-- **Excessive and messy scraped data:** Genius.com listed over 1,700 Taylor Swift–related songs—including features, production credits, and songs where she was mentioned—while she has only around 300 official releases. Cleaning and filtering this down to her actual discography was tedious and error-prone.
+- **Excessive and messy scraped data:** Genius.com listed over 1,700 Taylor Swift–related songs including features, production credits, and songs where she was mentioned even if she has only around 300 official releases. Cleaning and filtering this down to her actual discography was tedious and error-prone.
 - **Dataset Joining Issues:** Even after extensive cleaning, a low similarity threshold (10%) had to be used when merging datasets by `song_name`. Some duplicates may have been incorrectly included or excluded.
 - **Sentiment Analysis Limitations:** The 511-character limit of the transformer model fails to capture nuance, emotional shifts, sarcasm, and poetic structure in Taylor Swift’s lyrics. Examples include *Happiness* (a sad song) and *It’s Actually Romantic* (a diss track written ironically).
 - **Topic Modeling Constraints:** LDA treats words independently, which overlooks lyrical context and complexity. Some songs were misclustered or oversimplified (e.g., *Is It Over Now?* and *Lover* in the same “Honey and Daylight” cluster).
@@ -133,7 +133,7 @@ The Streamlit app acted as an effective analytics prototype, giving users an int
 
 - The app could evolve into a mood- or theme-based music browsing tool with album-inspired color palettes.  
 - Integrating music playback directly within the interface would greatly enhance user engagement.  
-- Streamlit’s simplicity made development smooth and allowed fast iteration—useful for prototyping real-world applications.  
+- Streamlit’s simplicity made development smooth and allowed fast iteration that was useful for prototyping real-world applications.  
 - Two versions could be created:  
   - **Fan-facing app:** focused on aesthetics, mood, color themes, and song exploration  
   - **Marketing/analytics app:** incorporating sales data, streaming performance, and musical characteristics to identify patterns behind successful tracks  
